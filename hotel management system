@@ -1,0 +1,140 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Room {
+    private int number;
+    private boolean available;
+
+    public Room(int number) {
+        this.number = number;
+        this.available = true;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+}
+
+class Booking {
+    private int bookingID;
+    private String customerName;
+    private int roomNumber;
+    private boolean confirmed;
+
+    public Booking(int bookingID, String customerName, int roomNumber) {
+        this.bookingID = bookingID;
+        this.customerName = customerName;
+        this.roomNumber = roomNumber;
+        this.confirmed = false;
+    }
+
+    public int getBookingID() {
+        return bookingID;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public int getRoomNumber() {
+        return roomNumber;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+}
+
+class Hotel {
+    private List<Room> rooms;
+    private List<Booking> bookings;
+    private int nextBookingID;
+
+    public Hotel(int numRooms) {
+        rooms = new ArrayList<>();
+        bookings = new ArrayList<>();
+        nextBookingID = 1;
+
+        for (int i = 1; i <= numRooms; i++) {
+            rooms.add(new Room(i));
+        }
+    }
+
+    public int bookRoom(String customerName) {
+        for (Room room : rooms) {
+            if (room.isAvailable()) {
+                room.setAvailable(false);
+                Booking booking = new Booking(nextBookingID++, customerName, room.getNumber());
+                bookings.add(booking);
+                return booking.getBookingID();
+            }
+        }
+        return -1;
+    }
+
+    public boolean confirmBooking(int bookingID) {
+        for (Booking booking : bookings) {
+            if (booking.getBookingID() == bookingID) {
+                booking.setConfirmed(true);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void cancelBooking(int bookingID) {
+        for (Booking booking : bookings) {
+            if (booking.getBookingID() == bookingID) {
+                for (Room room : rooms) {
+                    if (room.getNumber() == booking.getRoomNumber()) {
+                        room.setAvailable(true);
+                        break;
+                    }
+                }
+                bookings.remove(booking);
+                break;
+            }
+        }
+    }
+
+    public void printBookings() {
+        System.out.println("Bookings:");
+        for (Booking booking : bookings) {
+            System.out.println("Booking ID: " + booking.getBookingID() +
+                               ", Customer Name: " + booking.getCustomerName() +
+                               ", Room Number: " + booking.getRoomNumber() +
+                               ", Confirmed: " + booking.isConfirmed());
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Hotel hotel = new Hotel(10); // Create a hotel with 10 rooms
+
+        // Book some rooms
+        int bookingID1 = hotel.bookRoom("John Doe");
+        int bookingID2 = hotel.bookRoom("Jane Smith");
+
+        // Confirm one booking
+        hotel.confirmBooking(bookingID1);
+
+        // Cancel one booking
+        hotel.cancelBooking(bookingID2);
+
+        // Print all bookings
+        hotel.printBookings();
+    }
+}
