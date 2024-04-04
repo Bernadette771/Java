@@ -1,0 +1,115 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+class User {
+    private String username;
+    private String password;
+    private Map<String, Integer> shoppingCart;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+        this.shoppingCart = new HashMap<>();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public boolean authenticate(String password) {
+        return this.password.equals(password);
+    }
+
+    public void addToCart(String productName, int quantity) {
+        shoppingCart.put(productName, shoppingCart.getOrDefault(productName, 0) + quantity);
+    }
+
+    public Map<String, Integer> getShoppingCart() {
+        return shoppingCart;
+    }
+}
+
+class Product {
+    private String name;
+    private double price;
+
+    public Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+}
+
+class OnlineStore {
+    private List<Product> products;
+    private Map<String, User> users;
+
+    public OnlineStore() {
+        this.products = new ArrayList<>();
+        this.users = new HashMap<>();
+    }
+
+    public void addProduct(String name, double price) {
+        products.add(new Product(name, price));
+    }
+
+    public void registerUser(String username, String password) {
+        users.put(username, new User(username, password));
+    }
+
+    public boolean authenticateUser(String username, String password) {
+        User user = users.get(username);
+        return user != null && user.authenticate(password);
+    }
+
+    public void addToCart(String username, String productName, int quantity) {
+        User user = users.get(username);
+        if (user != null) {
+            user.addToCart(productName, quantity);
+        }
+    }
+
+    public Map<String, Integer> getShoppingCart(String username) {
+        User user = users.get(username);
+        return user != null ? user.getShoppingCart() : null;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        OnlineStore store = new OnlineStore();
+
+        // Add products
+        store.addProduct("iPhone 13", 799.99);
+        store.addProduct("MacBook Pro", 1299.99);
+        store.addProduct("Apple Watch", 299.99);
+
+        // Register users
+        store.registerUser("user1", "password1");
+        store.registerUser("user2", "password2");
+
+        // User authentication
+        System.out.println("User authentication:");
+        System.out.println("User1: " + store.authenticateUser("user1", "password1")); // true
+        System.out.println("User2: " + store.authenticateUser("user2", "password"));  // false
+
+        // Add products to shopping cart
+        store.addToCart("user1", "iPhone 13", 2);
+        store.addToCart("user1", "MacBook Pro", 1);
+        store.addToCart("user2", "Apple Watch", 3);
+
+        // View shopping cart
+        System.out.println("\nShopping Cart:");
+        System.out.println("User1: " + store.getShoppingCart("user1")); // {iPhone 13=2, MacBook Pro=1}
+        System.out.println("User2: " + store.getShoppingCart("user2")); // {Apple Watch=3}
+    }
+}
